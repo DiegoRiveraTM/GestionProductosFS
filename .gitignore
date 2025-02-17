@@ -1,0 +1,65 @@
+# 🔹 Ignorar dependencias de Node.js
+node_modules/
+**/node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# 🔹 Ignorar archivos de configuración del entorno
+.env
+**/.env
+.env.local
+.env.development
+.env.production
+.env.test
+.env.example
+backend/.env
+frontend/.env
+
+# 🔹 Ignorar archivos de compilación y caché
+dist/
+.turbo/
+.next/
+.out/
+build/
+.parcel-cache/
+.vite/
+.cache/
+**/dist/
+**/.next/
+**/.out/
+**/build/
+**/.cache/
+
+# 🔹 Ignorar archivos de logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+pnpm-debug.log*
+.eslintcache
+
+# 🔹 Ignorar archivos del sistema operativo
+.DS_Store
+Thumbs.db
+
+# 🔹 Ignorar configuraciones de Git y VSCode
+.git/
+.idea/
+.vscode/
+*.swp
+*.swo
+*.swn
+*.bak
+
+# 🔹 Ignorar posibles archivos de pruebas y cobertura
+coverage/
+jest-cache/
+jest.config.js
+jest.config.ts
+cypress/
+
+# 🔹 Ignorar archivos sensibles adicionales
+docker-compose.override.yml

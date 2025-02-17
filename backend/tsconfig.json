@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "CommonJS",
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "strict": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "moduleResolution": "node",
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true, // ✅ Permite importar archivos JSON en tests
+    "allowJs": true, // ✅ Permite usar JS en caso de archivos sin migrar a TS
+    "types": ["node", "express", "jest"] // ✅ Asegura que Jest y Express tienen soporte de TypeScript
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
+}
