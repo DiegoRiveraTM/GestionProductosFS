@@ -21,14 +21,15 @@ app.use(express.json());
 const allowedOrigins = [
   "http://localhost:5173",
   "https://gestionproductosfs.onrender.com", // Backend en producción
-  "https://gestion-productos-fs.vercel.app", // Frontend en producción
+  "https://frontend-seven-delta-60.vercel.app", // Frontend en producción
+  
 ];
 
 app.use(
   cors({
     origin: allowedOrigins,
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
