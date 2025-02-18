@@ -17,25 +17,28 @@ const app = express();
 // Middleware para parsear JSON
 app.use(express.json());
 
-// 🔥 Configurar CORS
-// Agrega aquí los dominios de tu frontend (local, producción, etc.)
+// 🔥 Configurar CORS correctamente
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://frontend-seven-delta-60.vercel.app",  // Agrega la URL de producción
+  "https://frontend-seven-delta-60.vercel.app", // Agrega la URL de producción
 ];
-
-app.use(cors({
-  origin: allowedOrigins,
-  credentials: true,
-}));
-
 
 app.use(
   cors({
     origin: allowedOrigins,
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
+
+// 🔄 **Manejar solicitudes preflight**
+app.options("*", (req, res) => {
+  res.header("Access-Control-Allow-Origin", req.headers.origin || "*");
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.status(204).send(); // No content
+});
 
 // Rutas
 app.use("/api/auth", authRoutes);
