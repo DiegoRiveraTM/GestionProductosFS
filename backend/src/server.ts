@@ -58,12 +58,11 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 });
 
 // Iniciar el servidor solo si no está en modo de test
-const PORT = process.env.PORT || 5000;
-if (process.env.NODE_ENV !== "test") {
-  app.listen(PORT, () => {
-    console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
-  });
-}
+const PORT = Number(process.env.PORT) || 3000;
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`🚀 Servidor corriendo en el puerto ${PORT}`);
+});
+
 
 // Exportamos `app` para pruebas con Jest (o cualquier otro test runner)
 export default app;
