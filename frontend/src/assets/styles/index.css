@@ -1,1 +1,26 @@
 @import "tailwindcss";
+
+/* Forzar el color del texto en los inputs */
+input,
+textarea {
+  color: white !important;
+  -webkit-text-fill-color: white !important; /* Soluciona el problema en Chrome */
+  caret-color: white !important; /* Color del cursor */
+}
+
+/* Evita cambios de color al autocompletar */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+textarea:-webkit-autofill, 
+textarea:-webkit-autofill:hover, 
+textarea:-webkit-autofill:focus {
+  background-color: transparent !important; /* Mantiene el fondo */
+  -webkit-text-fill-color: white !important; /* Color del texto */
+  transition: background-color 5000s ease-in-out 0s; /* Previene cambios de color */
+}
+
+/* Deshabilitar corrector ortográfico para evitar el cambio de color */
+input {
+  -webkit-user-modify: read-write-plaintext-only;
+}
