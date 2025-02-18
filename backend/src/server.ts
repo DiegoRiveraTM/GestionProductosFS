@@ -21,10 +21,14 @@ app.use(express.json());
 // Agrega aquí los dominios de tu frontend (local, producción, etc.)
 const allowedOrigins = [
   "http://localhost:5173",
-  "http://localhost:5174",
-  "https://gestionproductosfs.onrender.com", 
-  // Agrega aquí más orígenes si tu frontend está en otro dominio
+  "https://frontend-seven-delta-60.vercel.app",  // Agrega la URL de producción
 ];
+
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true,
+}));
+
 
 app.use(
   cors({
