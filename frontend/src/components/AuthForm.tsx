@@ -11,6 +11,9 @@ const AuthForm = () => {
 
   const navigate = useNavigate();
 
+  // Verificar que la URL de la API se obtiene correctamente
+  console.log("API_URL:", import.meta.env.VITE_API_URL);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -18,9 +21,15 @@ const AuthForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    const apiBaseUrl = import.meta.env.VITE_API_URL; // Asegurar que la URL esté correcta
+    if (!apiBaseUrl) {
+      alert("⚠ Error: La URL de la API no está definida en las variables de entorno.");
+      return;
+    }
+
     const url = isRegister
-      ? `${import.meta.env.VITE_API_URL}/api/auth/register`
-      : `${import.meta.env.VITE_API_URL}/api/auth/login`;
+      ? `${apiBaseUrl}/auth/register`
+      : `${apiBaseUrl}/auth/login`;
 
     try {
       const response = await fetch(url, {
@@ -32,16 +41,17 @@ const AuthForm = () => {
       });
 
       const data = await response.json();
+      
       if (response.ok) {
         localStorage.setItem("token", data.token);
         alert(`✅ ${isRegister ? "Registro" : "Inicio de sesión"} exitoso`);
         navigate("/products"); // Redirigir después de registrarse o iniciar sesión
       } else {
-        alert(`❌ Error: ${data.message}`);
+        alert(`❌ Error: ${data.message || "Ocurrió un problema"}`);
       }
     } catch (error) {
-      console.error("Error en la autenticación:", error);
-      alert("❌ Error en el servidor");
+      console.error("❌ Error en la autenticación:", error);
+      alert("⚠ Error en la conexión con el servidor.");
     }
   };
 
@@ -103,4 +113,3 @@ const AuthForm = () => {
 };
 
 export default AuthForm;
-

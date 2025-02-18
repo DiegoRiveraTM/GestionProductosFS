@@ -9,6 +9,12 @@ import ProductForm from "../components/ProductForm";
 import Aurora from "../components/Aurora";
 import type { Product } from "../types/product";
 
+// 📌 Verificar si la API URL está definida
+const API_URL = import.meta.env.VITE_API_URL;
+if (!API_URL) {
+  console.error("❌ VITE_API_URL no está definido. Revisa tu .env");
+}
+
 export const ProductPage = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -18,35 +24,39 @@ export const ProductPage = () => {
   const [showForm, setShowForm] = useState(false);
 
   useEffect(() => {
-    if (!user?.token) return;
-  
+    if (!user?.token || !API_URL) return;
+
     const fetchProducts = async () => {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/products`, {
+        console.log("📡 Cargando productos desde:", `${API_URL}/products`);
+        const res = await fetch(`${API_URL}/products`, {
           headers: { Authorization: `Bearer ${user.token}` },
         });
-  
+
         if (!res.ok) {
           throw new Error(`Error HTTP: ${res.status}`);
         }
-  
+
         const data = await res.json();
         setProducts(data);
       } catch (err) {
-        console.error("Error al cargar productos:", err);
+        console.error("❌ Error al cargar productos:", err);
         setError("No se pudieron cargar los productos.");
       } finally {
         setLoading(false);
       }
     };
-  
+
     fetchProducts();
   }, [user?.token]);
 
   const addProduct = useCallback(
     async (newProduct: { name: string; price: number; description: string }) => {
+      if (!API_URL) return;
+
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/products`, {
+        console.log("📡 Agregando producto a:", `${API_URL}/products`);
+        const res = await fetch(`${API_URL}/products`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -54,39 +64,42 @@ export const ProductPage = () => {
           },
           body: JSON.stringify(newProduct),
         });
-  
+
         if (!res.ok) throw new Error("No se pudo agregar el producto");
-  
+
         const data: Product = await res.json();
         setProducts((prevProducts) => [...prevProducts, { ...data, id: data._id }]);
         setShowForm(false);
       } catch (err) {
-        console.error("Error al agregar producto:", err);
+        console.error("❌ Error al agregar producto:", err);
         setError("Error al agregar producto.");
       }
     },
     [user?.token]
   );
-  
+
   const deleteProduct = useCallback(
     async (id: string) => {
+      if (!API_URL) return;
+
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/products/${id}`, {
+        console.log("📡 Eliminando producto en:", `${API_URL}/products/${id}`);
+        const res = await fetch(`${API_URL}/products/${id}`, {
           method: "DELETE",
           headers: { Authorization: `Bearer ${user?.token}` },
         });
-  
+
         if (!res.ok) throw new Error("No se pudo eliminar el producto");
-  
-        setProducts((prevProducts) => prevProducts.filter((product) => product._id !== id));
+
+        setProducts((prevProducts) => prevProducts.filter((product) => product.id !== id));
       } catch (err) {
-        console.error("Error al eliminar producto:", err);
+        console.error("❌ Error al eliminar producto:", err);
         setError("Error al eliminar producto.");
       }
     },
     [user?.token]
   );
-  
+
   const handleLogout = () => {
     logout();
     navigate("/auth");

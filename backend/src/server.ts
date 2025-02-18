@@ -20,25 +20,18 @@ app.use(express.json());
 // 🔥 Configurar CORS correctamente
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://gestion-productos-fs.vercel.app", // Corregido
+  "https://gestionproductosfs.onrender.com", // Backend en producción
+  "https://gestion-productos-fs.vercel.app", // Frontend en producción
 ];
 
 app.use(
   cors({
     origin: allowedOrigins,
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
-
-// 🔄 **Manejar solicitudes preflight**
-app.options("*", (req, res) => {
-  res.header("Access-Control-Allow-Origin", req.headers.origin || "*");
-  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  res.status(204).send();
-});
 
 // Rutas
 app.use("/api/auth", authRoutes);
@@ -62,7 +55,6 @@ const PORT = Number(process.env.PORT) || 3000;
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`🚀 Servidor corriendo en el puerto ${PORT}`);
 });
-
 
 // Exportamos `app` para pruebas con Jest (o cualquier otro test runner)
 export default app;
