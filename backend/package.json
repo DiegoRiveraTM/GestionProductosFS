@@ -5,7 +5,7 @@
   "scripts": {
     "setup": "npm install && npm run build",
     "dev": "nodemon src/server.ts",
-    "build": "tsc",
+    "build": "npm install && tsc",
     "start": "node dist/server.js",
     "test": "jest",
     "test:watch": "jest --watch",
