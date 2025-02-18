@@ -51,8 +51,8 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 });
 
 // Iniciar el servidor solo si no está en modo de test
-const PORT = Number(process.env.PORT) || 3000;
-app.listen(PORT, "0.0.0.0", () => {
+const PORT = process.env.PORT ? Number(process.env.PORT) : 10000;
+app.listen(PORT, () => {
   console.log(`🚀 Servidor corriendo en el puerto ${PORT}`);
 });
 
