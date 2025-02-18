@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { AuthContext } from "../context/AuthContext"; // ✅ Corrección de importación
+import { AuthContext } from "../context/authContext"; // ✅ Corrección de importación
 
 export const useAuth = () => {
   const context = useContext(AuthContext);

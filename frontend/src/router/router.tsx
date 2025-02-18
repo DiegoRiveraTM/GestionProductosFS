@@ -3,7 +3,7 @@ import Auth from "../pages/Auth";
 import Home from "../pages/Home";
 import ProductPage from "../pages/ProductPage";
 import ProtectedRoute from "./ProtectedRoute";
-import { AuthProvider } from "../context/AuthContext";
+import { AuthProvider } from "../context/AuthProvider";
 
 const AppRouter = () => {
   return (
