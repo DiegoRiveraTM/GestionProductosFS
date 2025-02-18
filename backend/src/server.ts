@@ -20,7 +20,7 @@ app.use(express.json());
 // 🔥 Configurar CORS correctamente
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://frontend-seven-delta-60.vercel.app", // Agrega la URL de producción
+  "https://gestion-productos-fs.vercel.app", // Corregido
 ];
 
 app.use(
@@ -37,7 +37,7 @@ app.options("*", (req, res) => {
   res.header("Access-Control-Allow-Origin", req.headers.origin || "*");
   res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
   res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  res.status(204).send(); // No content
+  res.status(204).send();
 });
 
 // Rutas
