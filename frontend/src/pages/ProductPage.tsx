@@ -19,17 +19,17 @@ export const ProductPage = () => {
 
   useEffect(() => {
     if (!user?.token) return;
-
+  
     const fetchProducts = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/products", {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/products`, {
           headers: { Authorization: `Bearer ${user.token}` },
         });
-
+  
         if (!res.ok) {
           throw new Error(`Error HTTP: ${res.status}`);
         }
-
+  
         const data = await res.json();
         setProducts(data);
       } catch (err) {
@@ -39,14 +39,14 @@ export const ProductPage = () => {
         setLoading(false);
       }
     };
-
+  
     fetchProducts();
   }, [user?.token]);
 
   const addProduct = useCallback(
     async (newProduct: { name: string; price: number; description: string }) => {
       try {
-        const res = await fetch("http://localhost:5000/api/products", {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/products`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -54,9 +54,9 @@ export const ProductPage = () => {
           },
           body: JSON.stringify(newProduct),
         });
-
+  
         if (!res.ok) throw new Error("No se pudo agregar el producto");
-
+  
         const data: Product = await res.json();
         setProducts((prevProducts) => [...prevProducts, { ...data, id: data._id }]);
         setShowForm(false);
@@ -67,17 +67,17 @@ export const ProductPage = () => {
     },
     [user?.token]
   );
-
+  
   const deleteProduct = useCallback(
     async (id: string) => {
       try {
-        const res = await fetch(`http://localhost:5000/api/products/${id}`, {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/products/${id}`, {
           method: "DELETE",
           headers: { Authorization: `Bearer ${user?.token}` },
         });
-
+  
         if (!res.ok) throw new Error("No se pudo eliminar el producto");
-
+  
         setProducts((prevProducts) => prevProducts.filter((product) => product._id !== id));
       } catch (err) {
         console.error("Error al eliminar producto:", err);
@@ -86,7 +86,7 @@ export const ProductPage = () => {
     },
     [user?.token]
   );
-
+  
   const handleLogout = () => {
     logout();
     navigate("/auth");
