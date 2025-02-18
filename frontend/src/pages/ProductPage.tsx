@@ -28,8 +28,8 @@ export const ProductPage = () => {
 
     const fetchProducts = async () => {
       try {
-        console.log("📡 Cargando productos desde:", `${API_URL}/products`);
-        const res = await fetch(`${API_URL}/products`, {
+        console.log("📡 Cargando productos desde:", `${API_URL}/api/products`);
+        const res = await fetch(`${API_URL}/api/products`, {
           headers: { Authorization: `Bearer ${user.token}` },
         });
 
@@ -55,8 +55,8 @@ export const ProductPage = () => {
       if (!API_URL) return;
 
       try {
-        console.log("📡 Agregando producto a:", `${API_URL}/products`);
-        const res = await fetch(`${API_URL}/products`, {
+        console.log("📡 Agregando producto a:", `${API_URL}/api/products`);
+        const res = await fetch(`${API_URL}/api/products`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -83,8 +83,8 @@ export const ProductPage = () => {
       if (!API_URL) return;
 
       try {
-        console.log("📡 Eliminando producto en:", `${API_URL}/products/${id}`);
-        const res = await fetch(`${API_URL}/products/${id}`, {
+        console.log("📡 Eliminando producto en:", `${API_URL}/api/products/${id}`);
+        const res = await fetch(`${API_URL}/api/products/${id}`, {
           method: "DELETE",
           headers: { Authorization: `Bearer ${user?.token}` },
         });
