@@ -4,7 +4,7 @@ import { API_URL } from "../api/config";
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { useAuth } from "../context/authHooks";
 import { useNavigate } from "react-router-dom";
-import { Plus, LogOut, Loader2 } from "lucide-react";
+import { Plus, LogOut } from "lucide-react";
 import ProductTable from "../components/ProductTable";
 import ProductForm from "../components/ProductForm";
 import Aurora from "../components/Aurora";
@@ -19,68 +19,59 @@ export const ProductPage = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
 
+  console.log("🛠 API_URL:", API_URL);
+  console.log("🧑‍💻 Usuario autenticado:", user);
+  console.log("🔑 Token en localStorage:", localStorage.getItem("token"));
+
   // 📌 Cargar productos desde el backend
   useEffect(() => {
-    if (!user?.token) {
+    if (!user?.token && !localStorage.getItem("token")) {
       console.warn("⚠️ Usuario no autenticado, no se cargarán productos.");
-      setLoading(false); // ⬅️ Asegurar que no esté cargando si no hay usuario
       return;
     }
-  
+
     if (!API_URL) {
       setError("❌ Error: API_URL no está definida.");
-      setLoading(false); // ⬅️ Asegurar que no esté cargando si no hay API_URL
       return;
     }
 
     const fetchProducts = async () => {
       try {
         console.log(`📡 Cargando productos desde: ${API_URL}/products`);
-    
-        // 🔥 Obtener el token antes de usarlo
-        const token = localStorage.getItem("token");
-    
+
+        const token = user?.token || localStorage.getItem("token");
+
         if (!token) {
           console.error("⚠ No hay token en localStorage, cancelando petición.");
-          return null;
+          return;
         }
-    
-        // 🔥 Verificar que `API_URL` esté definido
-        if (!API_URL) {
-          console.error("⚠ API_URL no está definido en las variables de entorno.");
-          return null;
-        }
-    
+
         const res = await fetch(`${API_URL}/products`, {
           method: "GET",
           headers: {
-            "Authorization": `Bearer ${token}`, // 🔥 Ahora token sí está definido
+            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-          credentials: "include", // 🔥 Importante para CORS
+          credentials: "include",
         });
-    
+
         if (!res.ok) {
           throw new Error(`❌ Error HTTP: ${res.status}`);
         }
-    
+
         const data = await res.json();
         console.log("✅ Productos obtenidos:", data);
-        return data;
+        setProducts(data);
       } catch (err) {
         console.error("❌ Error al obtener productos:", err);
-        return null;
       }
     };
-    
-    
 
     fetchProducts();
-  }, [user?.token]);
+  }, [user]);
 
   // 📌 Agregar producto
   const addProduct = useCallback(
@@ -89,42 +80,43 @@ export const ProductPage = () => {
         setError("❌ Error: API_URL no está definida.");
         return;
       }
-  
-      if (!user?.token) {
+
+      const token = user?.token || localStorage.getItem("token");
+      if (!token) {
         console.error("⚠ No hay token en user, cancelando petición.");
         setError("⚠ No tienes permisos para agregar productos.");
         return;
       }
-  
+
       try {
         console.log(`📡 Agregando producto a: ${API_URL}/products`);
-        console.log("🔑 Token usado en la petición:", user.token);
-  
+        console.log("🔑 Token usado en la petición:", token);
+
         const res = await fetch(`${API_URL}/products`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${user.token}`, // 🔥 Ahora siempre habrá un token válido
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify(newProduct),
         });
-  
+
         console.log("📡 Respuesta de la API:", res.status, res.statusText);
-  
+
         if (!res.ok) {
           const errorResponse = await res.json();
           console.error("❌ Respuesta de error:", errorResponse);
           throw new Error(`Error ${res.status}: ${errorResponse.message || "No se pudo agregar el producto"}`);
         }
-  
+
         const data: Product = await res.json();
         console.log("✅ Producto agregado con éxito:", data);
         setProducts((prevProducts) => [...prevProducts, { ...data, id: data._id }]);
         setShowForm(false);
-      } catch (err: unknown) {
+      } catch (err) {
         console.error("❌ Error al agregar producto:", err);
-  
-        // 🔥 Solución al error de TypeScript
+
+        // ✅ Corrección: Manejo de errores en TypeScript
         if (err instanceof Error) {
           setError(err.message);
         } else {
@@ -132,9 +124,8 @@ export const ProductPage = () => {
         }
       }
     },
-    [user?.token]
+    [user]
   );
-  
 
   // 📌 Eliminar producto
   const deleteProduct = useCallback(
@@ -146,9 +137,17 @@ export const ProductPage = () => {
 
       try {
         console.log(`📡 Eliminando producto en: ${API_URL}/products/${id}`);
+        const token = user?.token || localStorage.getItem("token");
+
+        if (!token) {
+          console.error("⚠ No hay token en user, cancelando petición.");
+          setError("⚠ No tienes permisos para eliminar productos.");
+          return;
+        }
+
         const res = await fetch(`${API_URL}/products/${id}`, {
           method: "DELETE",
-          headers: { Authorization: `Bearer ${user?.token}` },
+          headers: { Authorization: `Bearer ${token}` },
         });
 
         if (!res.ok) throw new Error("No se pudo eliminar el producto");
@@ -159,7 +158,7 @@ export const ProductPage = () => {
         setError("Error al eliminar producto.");
       }
     },
-    [user?.token]
+    [user]
   );
 
   // 📌 Cerrar sesión
@@ -176,10 +175,8 @@ export const ProductPage = () => {
 
   return (
     <div className="fixed inset-0 w-full h-full bg-gradient-to-br from-[#1a0b2e] via-[#4b1167] to-[#064e3b]">
-      {/* Aurora Background */}
       <div className="absolute inset-0 w-full h-full">{memoizedAurora}</div>
 
-      {/* Navbar */}
       <header className="absolute top-0 left-0 w-full p-4 flex justify-end bg-black/50 backdrop-blur-md z-20">
         <button
           onClick={handleLogout}
@@ -190,55 +187,21 @@ export const ProductPage = () => {
         </button>
       </header>
 
-      {/* Contenido de la página */}
       <div className="relative z-10 flex items-center justify-center w-full h-full px-4">
         <div className="w-full max-w-5xl p-8 rounded-xl backdrop-blur-md bg-black/40 shadow-2xl border border-purple-900/20">
-          <h2 className="mb-6 text-3xl font-bold text-center text-purple-100">
-            Gestión de Productos
-          </h2>
+          <h2 className="mb-6 text-3xl font-bold text-center text-purple-100">Gestión de Productos</h2>
 
-          {/* Error Message */}
-          {error && (
-            <div className="mb-6 p-4 bg-red-900/20 border border-red-800/50 rounded-lg">
-              <p className="text-red-200 text-center">{error}</p>
-            </div>
-          )}
+          {error && <div className="mb-6 p-4 bg-red-900/20 border border-red-800/50 rounded-lg"><p className="text-red-200 text-center">{error}</p></div>}
 
-          {/* Loading State */}
-          {loading ? (
-            <div className="flex flex-col items-center justify-center py-12">
-              <Loader2 className="w-8 h-8 text-purple-300 animate-spin" />
-              <p className="mt-4 text-purple-200/80">Cargando productos...</p>
-            </div>
+          {!showForm ? (
+            <button onClick={() => setShowForm(true)} className="flex items-center gap-2 px-4 py-2 bg-emerald-900/80 hover:bg-emerald-800 text-white rounded-lg transition-all">
+              <Plus size={20} /> Agregar Producto
+            </button>
           ) : (
-            <div className="space-y-6">
-              {/* Botón para agregar producto o formulario */}
-              {!showForm ? (
-                <button
-                  onClick={() => setShowForm(true)}
-                  className="flex items-center gap-2 px-4 py-2 bg-emerald-900/80 hover:bg-emerald-800 text-white rounded-lg transition-all"
-                >
-                  <Plus size={20} />
-                  Agregar Producto
-                </button>
-              ) : (
-                <div className="bg-purple-950/30 rounded-lg p-6 backdrop-blur-sm border border-purple-900/20">
-                  <ProductForm onAdd={addProduct} />
-                </div>
-              )}
-
-              {/* Tabla de productos */}
-              {products.length === 0 ? (
-                <div className="text-center py-12">
-                  <p className="text-purple-200/60">No hay productos disponibles.</p>
-                </div>
-              ) : (
-                <div className="bg-purple-950/30 rounded-lg backdrop-blur-sm overflow-hidden border border-purple-900/20">
-                  <ProductTable products={products} onDelete={deleteProduct} />
-                </div>
-              )}
-            </div>
+            <ProductForm onAdd={addProduct} />
           )}
+
+          <ProductTable products={products} onDelete={deleteProduct} />
         </div>
       </div>
     </div>
