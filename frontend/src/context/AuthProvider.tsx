@@ -11,16 +11,25 @@ if (!API_URL) {
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
 
+  // ✅ Cargar usuario y token desde localStorage al iniciar la app
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
+    const token = localStorage.getItem("token"); // 🔥 Recuperar token también
+
     try {
-      setUser(storedUser ? JSON.parse(storedUser) : null);
+      if (storedUser && token) {
+        const parsedUser = JSON.parse(storedUser);
+        setUser({ ...parsedUser, token }); // 🔥 Incluir token en user
+      } else {
+        setUser(null);
+      }
     } catch (error) {
       console.error("❌ Error al parsear los datos del usuario:", error);
       setUser(null);
     }
   }, []);
 
+  // ✅ Login con almacenamiento correcto
   const login = async (email: string, password: string): Promise<boolean> => {
     if (!API_URL) {
       alert("⚠ Error: La URL de la API no está configurada correctamente.");
@@ -38,11 +47,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Error en autenticación");
 
+      // ✅ Guardar user y token juntos
+      const userWithToken = { ...data.user, token: data.token };
+      localStorage.setItem("user", JSON.stringify(userWithToken));
       localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
-      setUser(data.user);
+      setUser(userWithToken);
 
-      console.log("✅ Inicio de sesión exitoso:", data.user);
+      console.log("✅ Inicio de sesión exitoso:", userWithToken);
       return true;
     } catch (error) {
       console.error("🚨 Error en login:", error);
@@ -51,6 +62,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  // ✅ Logout asegurando que todo se limpie correctamente
   const logout = () => {
     try {
       console.log("🚪 Cerrando sesión...");
