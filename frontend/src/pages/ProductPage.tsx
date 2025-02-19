@@ -1,6 +1,6 @@
 "use client";
 
-import { API_URL } from "../config";  // ✅ Importamos la API aquí donde sí se usa
+import { API_URL } from "../api/config";
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { useAuth } from "../context/authHooks";
 import { useNavigate } from "react-router-dom";
@@ -10,7 +10,7 @@ import ProductForm from "../components/ProductForm";
 import Aurora from "../components/Aurora";
 import type { Product } from "../types/product";
 
-// 📌 Verificar si la API URL está definida
+// 📌 Verificar si la API_URL está definida correctamente
 if (!API_URL) {
   console.error("❌ VITE_API_URL no está definido. Revisa tu .env");
 }
@@ -23,16 +23,23 @@ export const ProductPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
 
+  // 📌 Cargar productos desde el backend
   useEffect(() => {
-    if (!user?.token || !API_URL) return;
+    if (!user?.token) {
+      console.warn("⚠️ Usuario no autenticado, no se cargarán productos.");
+      return;
+    }
+
+    if (!API_URL) {
+      setError("❌ Error: API_URL no está definida.");
+      return;
+    }
 
     const fetchProducts = async () => {
       try {
         console.log(`📡 Cargando productos desde: ${API_URL}/products`);
         const res = await fetch(`${API_URL}/products`, {
-          headers: { 
-            Authorization: `Bearer ${user.token}`
-          },
+          headers: { Authorization: `Bearer ${user.token}` },
         });
 
         if (!res.ok) {
@@ -52,9 +59,13 @@ export const ProductPage = () => {
     fetchProducts();
   }, [user?.token]);
 
+  // 📌 Agregar producto
   const addProduct = useCallback(
     async (newProduct: { name: string; price: number; description: string }) => {
-      if (!API_URL) return;
+      if (!API_URL) {
+        setError("❌ Error: API_URL no está definida.");
+        return;
+      }
 
       try {
         console.log(`📡 Agregando producto a: ${API_URL}/products`);
@@ -80,9 +91,13 @@ export const ProductPage = () => {
     [user?.token]
   );
 
+  // 📌 Eliminar producto
   const deleteProduct = useCallback(
     async (id: string) => {
-      if (!API_URL) return;
+      if (!API_URL) {
+        setError("❌ Error: API_URL no está definida.");
+        return;
+      }
 
       try {
         console.log(`📡 Eliminando producto en: ${API_URL}/products/${id}`);
@@ -102,16 +117,15 @@ export const ProductPage = () => {
     [user?.token]
   );
 
+  // 📌 Cerrar sesión
   const handleLogout = () => {
     logout();
     navigate("/auth");
   };
 
-  // Memoriza Aurora para evitar re-render innecesarios
+  // 📌 Memoriza el fondo Aurora para evitar re-renders innecesarios
   const memoizedAurora = useMemo(
-    () => (
-      <Aurora colorStops={["#1a0b2e", "#4b1167", "#064e3b"]} speed={0.3} amplitude={0.8} />
-    ),
+    () => <Aurora colorStops={["#1a0b2e", "#4b1167", "#064e3b"]} speed={0.3} amplitude={0.8} />,
     []
   );
 

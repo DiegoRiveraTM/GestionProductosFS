@@ -21,15 +21,14 @@ const AuthForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const apiBaseUrl = import.meta.env.VITE_API_URL; // Asegurar que la URL esté correcta
-    if (!apiBaseUrl) {
+    const API_URL = import.meta.env.VITE_API_URL;    if (!API_URL) {
       alert("⚠ Error: La URL de la API no está definida en las variables de entorno.");
       return;
     }
 
     const url = isRegister
-      ? `${apiBaseUrl}/auth/register`
-      : `${apiBaseUrl}/auth/login`;
+  ? `${API_URL}/auth/register`
+  : `${API_URL}/auth/login`;
 
     try {
       const response = await fetch(url, {
