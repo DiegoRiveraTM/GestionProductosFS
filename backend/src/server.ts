@@ -19,10 +19,7 @@ app.use(express.json());
 
 // 🔥 Configurar CORS correctamente
 const allowedOrigins = [
-  "http://localhost:5173",
   "https://gestionproductosfs.onrender.com", // Backend en producción
-  "https://gestion-productos-five.vercel.app", // Frontend en producción
-  
 ];
 
 app.use(
