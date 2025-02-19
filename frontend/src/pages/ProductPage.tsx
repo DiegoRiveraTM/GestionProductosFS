@@ -89,30 +89,52 @@ export const ProductPage = () => {
         setError("❌ Error: API_URL no está definida.");
         return;
       }
-
+  
+      if (!user?.token) {
+        console.error("⚠ No hay token en user, cancelando petición.");
+        setError("⚠ No tienes permisos para agregar productos.");
+        return;
+      }
+  
       try {
         console.log(`📡 Agregando producto a: ${API_URL}/products`);
+        console.log("🔑 Token usado en la petición:", user.token);
+  
         const res = await fetch(`${API_URL}/products`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${user?.token}`,
+            Authorization: `Bearer ${user.token}`, // 🔥 Ahora siempre habrá un token válido
           },
           body: JSON.stringify(newProduct),
         });
-
-        if (!res.ok) throw new Error("No se pudo agregar el producto");
-
+  
+        console.log("📡 Respuesta de la API:", res.status, res.statusText);
+  
+        if (!res.ok) {
+          const errorResponse = await res.json();
+          console.error("❌ Respuesta de error:", errorResponse);
+          throw new Error(`Error ${res.status}: ${errorResponse.message || "No se pudo agregar el producto"}`);
+        }
+  
         const data: Product = await res.json();
+        console.log("✅ Producto agregado con éxito:", data);
         setProducts((prevProducts) => [...prevProducts, { ...data, id: data._id }]);
         setShowForm(false);
-      } catch (err) {
+      } catch (err: unknown) {
         console.error("❌ Error al agregar producto:", err);
-        setError("Error al agregar producto.");
+  
+        // 🔥 Solución al error de TypeScript
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError("❌ Error desconocido al agregar producto.");
+        }
       }
     },
     [user?.token]
   );
+  
 
   // 📌 Eliminar producto
   const deleteProduct = useCallback(
