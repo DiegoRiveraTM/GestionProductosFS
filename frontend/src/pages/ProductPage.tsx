@@ -27,34 +27,57 @@ export const ProductPage = () => {
   useEffect(() => {
     if (!user?.token) {
       console.warn("⚠️ Usuario no autenticado, no se cargarán productos.");
+      setLoading(false); // ⬅️ Asegurar que no esté cargando si no hay usuario
       return;
     }
-
+  
     if (!API_URL) {
       setError("❌ Error: API_URL no está definida.");
+      setLoading(false); // ⬅️ Asegurar que no esté cargando si no hay API_URL
       return;
     }
 
     const fetchProducts = async () => {
       try {
         console.log(`📡 Cargando productos desde: ${API_URL}/products`);
-        const res = await fetch(`${API_URL}/products`, {
-          headers: { Authorization: `Bearer ${user.token}` },
-        });
-
-        if (!res.ok) {
-          throw new Error(`Error HTTP: ${res.status}`);
+    
+        // 🔥 Obtener el token antes de usarlo
+        const token = localStorage.getItem("token");
+    
+        if (!token) {
+          console.error("⚠ No hay token en localStorage, cancelando petición.");
+          return null;
         }
-
+    
+        // 🔥 Verificar que `API_URL` esté definido
+        if (!API_URL) {
+          console.error("⚠ API_URL no está definido en las variables de entorno.");
+          return null;
+        }
+    
+        const res = await fetch(`${API_URL}/products`, {
+          method: "GET",
+          headers: {
+            "Authorization": `Bearer ${token}`, // 🔥 Ahora token sí está definido
+            "Content-Type": "application/json",
+          },
+          credentials: "include", // 🔥 Importante para CORS
+        });
+    
+        if (!res.ok) {
+          throw new Error(`❌ Error HTTP: ${res.status}`);
+        }
+    
         const data = await res.json();
-        setProducts(data);
+        console.log("✅ Productos obtenidos:", data);
+        return data;
       } catch (err) {
-        console.error("❌ Error al cargar productos:", err);
-        setError("No se pudieron cargar los productos.");
-      } finally {
-        setLoading(false);
+        console.error("❌ Error al obtener productos:", err);
+        return null;
       }
     };
+    
+    
 
     fetchProducts();
   }, [user?.token]);
