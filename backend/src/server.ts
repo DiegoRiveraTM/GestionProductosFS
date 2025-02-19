@@ -21,7 +21,7 @@ app.use(express.json());
 const allowedOrigins = [
   "http://localhost:5173",
   "https://gestionproductosfs.onrender.com", // Backend en producción
-  "https://frontend-seven-delta-60.vercel.app", // Frontend en producción
+  "https://gestion-productos-five.vercel.app", // Frontend en producción
   
 ];
 
