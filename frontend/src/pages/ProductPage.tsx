@@ -1,5 +1,6 @@
 "use client";
 
+import { API_URL } from "../config";  // ✅ Importamos la API aquí donde sí se usa
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { useAuth } from "../context/authHooks";
 import { useNavigate } from "react-router-dom";
@@ -10,7 +11,6 @@ import Aurora from "../components/Aurora";
 import type { Product } from "../types/product";
 
 // 📌 Verificar si la API URL está definida
-const API_URL = import.meta.env.VITE_API_URL;
 if (!API_URL) {
   console.error("❌ VITE_API_URL no está definido. Revisa tu .env");
 }
@@ -28,9 +28,11 @@ export const ProductPage = () => {
 
     const fetchProducts = async () => {
       try {
-        console.log("📡 Cargando productos desde:", `${API_URL}/api/products`);
-        const res = await fetch(`${API_URL}/api/products`, {
-          headers: { Authorization: `Bearer ${user.token}` },
+        console.log(`📡 Cargando productos desde: ${API_URL}/products`);
+        const res = await fetch(`${API_URL}/products`, {
+          headers: { 
+            Authorization: `Bearer ${user.token}`
+          },
         });
 
         if (!res.ok) {
@@ -55,8 +57,8 @@ export const ProductPage = () => {
       if (!API_URL) return;
 
       try {
-        console.log("📡 Agregando producto a:", `${API_URL}/api/products`);
-        const res = await fetch(`${API_URL}/api/products`, {
+        console.log(`📡 Agregando producto a: ${API_URL}/products`);
+        const res = await fetch(`${API_URL}/products`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -83,8 +85,8 @@ export const ProductPage = () => {
       if (!API_URL) return;
 
       try {
-        console.log("📡 Eliminando producto en:", `${API_URL}/api/products/${id}`);
-        const res = await fetch(`${API_URL}/api/products/${id}`, {
+        console.log(`📡 Eliminando producto en: ${API_URL}/products/${id}`);
+        const res = await fetch(`${API_URL}/products/${id}`, {
           method: "DELETE",
           headers: { Authorization: `Bearer ${user?.token}` },
         });
