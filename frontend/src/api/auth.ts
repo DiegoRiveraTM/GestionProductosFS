@@ -10,7 +10,7 @@ export const login = async (data: LoginData): Promise<AuthResponse> => {
 };
 
 export const register = async (data: RegisterData): Promise<AuthResponse> => {
-  const response = await axios.post<AuthResponse>(`${API_URL}/register`, data);
+  const response = await axios.post<AuthResponse>(`${API_URL}/auth/register`, data); // 🔥 Corregí la URL
   localStorage.setItem("token", response.data.token); // 🔥 Guarda el token
   return response.data;
 };
